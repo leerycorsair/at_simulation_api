@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "AT_SIMULATION"
+name = "at_simulation_api"
 version = "0.1.0"
 description = ""
 authors = ["Leonov Vladislav <vladleonov21032002@gmail.com>"]
