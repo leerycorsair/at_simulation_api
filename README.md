@@ -4,6 +4,8 @@
 
 ## Общая схема вычислений
 
+TODO: Общая схема верна, но детали немного устарели и нужно ее обновить.
+
 ```mermaid
 sequenceDiagram
     participant Translator as Model Translator
