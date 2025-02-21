@@ -7,8 +7,6 @@ RUN apt-get update && \
     rm go1.23.4.linux-amd64.tar.gz && \
     ln -s /usr/local/go/bin/go /usr/bin/go
 
-RUN go version
-
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /usr/local/bin latest && \
     golangci-lint --version
 
