@@ -75,7 +75,6 @@ app.exception_handler(RequestValidationError)(validation_exception_handler)
 if __name__ == "__main__":
     parse_args()
     server_config = ServerConfigurator().get_server_config()
-    db_config = PostgresStore().get_database_config()
     uvicorn.run(
         app,
         host="0.0.0.0",

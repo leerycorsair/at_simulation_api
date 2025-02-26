@@ -1,3 +1,4 @@
+
 include docker/local/.env
 run:
 	bash -c "poetry run python application.py"

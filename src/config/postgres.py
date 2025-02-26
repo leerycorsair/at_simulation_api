@@ -23,25 +23,4 @@ class PostgresStore:
     @classmethod
     @lru_cache(maxsize=1)
     def get_database_config(cls) -> DatabaseConfig:
-        
-        import os
-
-        print()
-        print()
-        print()
-        print()
-        print()
-        print()
-        for key, value in os.environ.items():
-            print(f"{key}: {value}")
-            
-            
-        print()
-        print()
-        print()
-        print()
-        print()
-        print()
-        
-
         return DatabaseConfig()
