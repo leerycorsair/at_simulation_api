@@ -8,8 +8,6 @@ class ServerConfig(BaseSettings):
     port: int = Field(..., alias="SERVER_PORT")
 
     class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
         extra = "allow"
 
 

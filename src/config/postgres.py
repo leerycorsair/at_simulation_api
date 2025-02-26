@@ -16,8 +16,6 @@ class DatabaseConfig(BaseSettings):
         return f"postgresql+psycopg2://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
 
     class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
         extra = "allow"
 
 
@@ -25,4 +23,25 @@ class PostgresStore:
     @classmethod
     @lru_cache(maxsize=1)
     def get_database_config(cls) -> DatabaseConfig:
+        
+        import os
+
+        print()
+        print()
+        print()
+        print()
+        print()
+        print()
+        for key, value in os.environ.items():
+            print(f"{key}: {value}")
+            
+            
+        print()
+        print()
+        print()
+        print()
+        print()
+        print()
+        
+
         return DatabaseConfig()

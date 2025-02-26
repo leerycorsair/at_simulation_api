@@ -18,8 +18,6 @@ class MinioConfig(BaseSettings):
         return f"{self.host}:{self.api_port}"
 
     class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
         extra = "allow"
 
 

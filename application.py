@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.client.auth_client import AuthClientSingleton
 from src.config.cli_args import parse_args
+from src.config.postgres import PostgresStore
 from src.config.rabbitmq import RabbitMQStore
 from src.config.server import ServerConfigurator
 from src.delivery.core.middleware.fastapi_exception_handler import \
@@ -74,6 +75,7 @@ app.exception_handler(RequestValidationError)(validation_exception_handler)
 if __name__ == "__main__":
     parse_args()
     server_config = ServerConfigurator().get_server_config()
+    db_config = PostgresStore().get_database_config()
     uvicorn.run(
         app,
         host="0.0.0.0",

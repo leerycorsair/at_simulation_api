@@ -62,7 +62,7 @@ def parse_args():
     parse_rabbitmq_args(subparsers)
     parse_server_args(subparsers)
     args = parser.parse_args()
-
+    
     for key, value in vars(args).items():
         if value is not None:
             os.environ[key.upper()] = str(value)
