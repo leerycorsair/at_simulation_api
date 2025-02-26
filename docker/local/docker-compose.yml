@@ -1,36 +1,6 @@
 version: "3.9"
 
 services:
-  server: 
-    container_name: at_simulation_server
-    build:
-      context: ../..
-      dockerfile: ./docker/base/Dockerfile
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-    networks:
-      - custom-network
-    environment:
-      DB_HOST: postgres_simulation
-      DB_PORT: ${DB_PORT}   
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      DB_NAME: ${DB_NAME}
-      SERVER_PORT: ${SERVER_PORT}
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      RABBITMQ_PORT: ${RABBITMQ_PORT}
-
-      MINIO_HOST: ${MINIO_HOST}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
-      MINIO_SECURE: ${MINIO_SECURE}
-      MINIO_API_PORT: ${MINIO_API_PORT}
-      MINIO_CONSOLE_PORT: ${MINIO_CONSOLE_PORT}
-    depends_on:
-      postgres_simulation:
-        condition: service_healthy
-    
   postgres_simulation:
     container_name: at_simulation_db
     image: "postgres:alpine"

@@ -1,24 +1,25 @@
 import asyncio
 from contextlib import asynccontextmanager
 
+import uvicorn
 from at_queue.core.session import ConnectionParameters
 from fastapi import Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.client.auth_client import AuthClientSingleton
+from src.config.cli_args import parse_args
 from src.config.rabbitmq import RabbitMQStore
-from src.delivery.core.middleware.fastapi_exception_handler import (
-    validation_exception_handler,
-)
+from src.config.server import ServerConfigurator
+from src.delivery.core.middleware.fastapi_exception_handler import \
+    validation_exception_handler
 from src.delivery.core.middleware.logging import LoggingMiddleware
 from src.delivery.core.middleware.response import ResponseMiddleware
+from src.delivery.router import setup_routes
 from src.providers.model import get_model_service
 from src.providers.processor import get_processor_service
 from src.providers.translator import get_translator_service
 from src.worker.worker import ATSimulationWorker
-
-from .delivery.router import setup_routes
 
 
 @asynccontextmanager
@@ -50,8 +51,6 @@ async def lifespan(app: FastAPI):
         yield
     finally:
         task.cancel()
-        await simulation_worker.stop()
-        await simulation_worker.close()
 
     # Cleanup resources
     # shutdown_storage()
@@ -70,3 +69,13 @@ app.add_middleware(
 )
 
 app.exception_handler(RequestValidationError)(validation_exception_handler)
+
+
+if __name__ == "__main__":
+    parse_args()
+    server_config = ServerConfigurator().get_server_config()
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=server_config.port,
+    )

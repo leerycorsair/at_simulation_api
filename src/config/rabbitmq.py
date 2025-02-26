@@ -6,12 +6,12 @@ from yarl import URL
 
 
 class RabbitMQConfig(BaseSettings):
-    host: str = Field("localhost", alias="RABBITMQ_HOST")
-    port: int = Field(5672, alias="RABBITMQ_PORT")
-    login: str = Field("guest", alias="RABBITMQ_LOGIN")
-    password: str = Field("guest", alias="RABBITMQ_PASSWORD")
-    virtualhost: str = Field("/", alias="RABBITMQ_VHOST")
-    ssl: bool = Field(False, alias="RABBITMQ_SSL")
+    host: str = Field(..., alias="RABBITMQ_HOST")
+    port: int = Field(..., alias="RABBITMQ_PORT")
+    login: str = Field(..., alias="RABBITMQ_LOGIN")
+    password: str = Field(..., alias="RABBITMQ_PASSWORD")
+    virtualhost: str = Field(..., alias="RABBITMQ_VHOST")
+    ssl: bool = Field(..., alias="RABBITMQ_SSL")
 
     @property
     def url(self) -> URL:
@@ -24,6 +24,11 @@ class RabbitMQConfig(BaseSettings):
             password=self.password,
             path=self.virtualhost,
         )
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        extra = "allow"
 
 
 class RabbitMQStore:

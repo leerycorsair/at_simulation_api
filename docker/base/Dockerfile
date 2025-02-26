@@ -20,7 +20,8 @@ ENV PATH=$PATH:/root/go/bin
 COPY pyproject.toml poetry.lock / 
 RUN poetry install --no-root
 
-COPY . . 
-RUN chmod +x ./src/start.sh
+COPY . .
 
-CMD ["./src/start.sh"]
+RUN chmod +x ./application.py
+
+CMD ["poetry", "run", "python", "./application.py"]
