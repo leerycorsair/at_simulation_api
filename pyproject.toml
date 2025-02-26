@@ -3,7 +3,7 @@ name = "at_simulation_api"
 version = "0.1.0"
 description = ""
 authors = ["Leonov Vladislav <vladleonov21032002@gmail.com>"]
-packages = [{ include = "src" }]  # Include `src/` as the root package
+packages = [{ include = "src" }, { include = "application.py" }]  # Add application.py
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -25,8 +25,4 @@ urllib3 = "^2.3.0"
 pytest = "^5.2"
 
 [tool.poetry.scripts]
-at_simulation_api = "src.application:app"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+at_simulation_api = "application:app" 
