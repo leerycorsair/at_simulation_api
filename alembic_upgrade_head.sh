@@ -2,8 +2,8 @@
 
 echo "Starting Alembic upgrade script..."
 
-ENV_PATH="./docker/at_simulation_local/.env"
-DOCKER_COMPOSE_PATH="./docker/at_simulation_local/docker-compose.yml"
+ENV_PATH="./docker/local/.env"
+DOCKER_COMPOSE_PATH="./docker/local/docker-compose.yml"
 
 echo "Starting PostgreSQL container..."
 docker compose -f $DOCKER_COMPOSE_PATH up -d postgres_simulation
