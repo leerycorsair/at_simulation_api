@@ -1,0 +1,2 @@
+FROM python:3.12
+RUN pip install git+https://github.com/grigandal625/AT_QUEUE.git@master

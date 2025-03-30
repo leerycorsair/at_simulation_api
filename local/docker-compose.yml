@@ -1,7 +1,46 @@
 version: "3.9"
 
 services:
-  postgres_simulation:
+  rabbitmq:
+    container_name: at_rabbitmq
+    image: "rabbitmq:management"
+    ports:
+      - "${RABBIGMQ_UI_PORT}:15672"  
+      - "${RABBITMQ_PORT}:5672"    
+    networks:
+      - custom-network
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_LOGIN}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+    
+  at_queue:
+    container_name: at_queue
+    build:
+      dockerfile: ./docker_files/Dockerfile.at_queue
+    command: > 
+      python -m at_queue
+      --host rabbitmq
+      --port ${RABBITMQ_PORT}
+      --login ${RABBITMQ_LOGIN}
+      --password ${RABBITMQ_PASSWORD}
+      --virtualhost /
+    networks:
+      - custom-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ps -p $(cat /var/run/at_queue/pidfile.pid) || exit 1
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  at_simulation_db:
     container_name: at_simulation_db
     image: "postgres:alpine"
     expose:
@@ -24,7 +63,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     command: ["postgres", "-c", "port=${DB_PORT}"]
 
-  minio:
+  at_minio:
     container_name: at_minio
     image: "minio/minio:latest"
     command: server /data --console-address ":${MINIO_CONSOLE_PORT}" --address ":${MINIO_API_PORT}"
