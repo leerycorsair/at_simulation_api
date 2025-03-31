@@ -53,11 +53,6 @@ async def lifespan(app: FastAPI):
     finally:
         task.cancel()
 
-    # Cleanup resources
-    # shutdown_storage()
-    pass
-
-
 app = FastAPI(title="AT_SIMULATION", version="1.0.0", lifespan=lifespan)
 app.add_middleware(LoggingMiddleware)
 app.add_middleware(ResponseMiddleware)
