@@ -14,4 +14,4 @@ set -a && source .env
 
 # Run create revision script
 cd ../migrations || exit
-set +a && ./create_revision.sh "$1"
+set +a && bash ./create_revision.sh "$1"

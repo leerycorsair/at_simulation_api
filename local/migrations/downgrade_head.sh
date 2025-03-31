@@ -6,4 +6,4 @@ set -a && source .env
 
 # Run downgrade head script
 cd ../migrations || exit
-set +a && ./downgrade_head.sh
+set +a && bash ./downgrade_head.sh
