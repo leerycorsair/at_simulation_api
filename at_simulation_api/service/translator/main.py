@@ -1,3 +1,5 @@
+import os
+
 from jinja2 import Environment, FileSystemLoader, Template
 
 from at_simulation_api.service.model.models.models import Model
@@ -9,7 +11,8 @@ from at_simulation_api.service.translator.resource_type import trnsl_resource_ty
 from at_simulation_api.service.translator.rule import trnsl_rules
 from at_simulation_api.service.translator.template_usage import trnsl_template_usages
 
-TEMPLATE_DIR = "./at_simulation_api/service/translator/templates/"
+module_dir = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(module_dir, "templates")
 TEMPLATE_NAME = "main.jinja"
 
 current_env = Environment(

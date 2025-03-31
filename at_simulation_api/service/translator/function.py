@@ -1,11 +1,14 @@
+import os
 from typing import List
 
 from jinja2 import Environment, FileSystemLoader, Template
 
 from at_simulation_api.repository.editor.function.models.models import FunctionDB
 
-TEMPLATE_DIR = "./at_simulation_api/service/translator/templates/"
+module_dir = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(module_dir, "templates")
 TEMPLATE_NAME = "function.jinja"
+
 
 current_env = Environment(
     loader=FileSystemLoader(TEMPLATE_DIR),

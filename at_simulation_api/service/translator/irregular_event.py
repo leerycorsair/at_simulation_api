@@ -1,15 +1,14 @@
+import os
 from typing import List
 
 from jinja2 import Environment, FileSystemLoader, Template
 
 from at_simulation_api.repository.editor.resource.models.models import ResourceTypeDB
-from at_simulation_api.repository.editor.template.models.models import (
-    IrregularEventDB,
-    OperationDB,
-)
+from at_simulation_api.repository.editor.template.models.models import IrregularEventDB
 from at_simulation_api.service.translator.utils import preprocess_template_code
 
-TEMPLATE_DIR = "./at_simulation_api/service/translator/templates/"
+module_dir = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_DIR = os.path.join(module_dir, "templates")
 TEMPLATE_NAME = "irregular_event.jinja"
 
 current_env = Environment(
