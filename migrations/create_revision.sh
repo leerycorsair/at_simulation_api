@@ -1,55 +1,88 @@
 #!/bin/bash
+# Creates a new Alembic database revision with proper validation and error handling
+# Usage: ./create_revision.sh "Your revision description"
 
-echo "Starting migration script..."
+set -eo pipefail  # Exit on error and pipeline failures
+shopt -s nullglob # Prevent globbing from returning literal patterns
 
-ENV_PATH="./docker/local/.env"
-DOCKER_COMPOSE_PATH="./docker/local/docker-compose.yml"
+readonly SCRIPT_NAME=$(basename "$0")
+readonly GREEN='\033[0;32m'
+readonly RED='\033[0;31m'
+readonly NC='\033[0m' # No Color
 
-if [ -z "$1" ]; then
-  echo "No revision name provided. Usage: $0 <revision_name>"
-  exit 1
-fi
+#######################################
+# Logs an error message and exits
+# Arguments:
+#   $1 - Error message
+#   $2 - Exit code (optional, default: 1)
+#######################################
+_error_exit() {
+  echo -e "${RED}ERROR: ${1}${NC}" >&2
+  exit "${2:-1}"
+}
 
-REVISION_NAME=$1
+#######################################
+# Logs an informational message
+# Arguments:
+#   $1 - Message to display
+#######################################
+_log_info() {
+  echo -e "${GREEN}INFO: ${1}${NC}"
+}
 
-echo "Starting PostgreSQL container..."
-docker compose -f $DOCKER_COMPOSE_PATH up -d postgres_simulation
-if [ $? -ne 0 ]; then
-  echo "Failed to start PostgreSQL container."
-  exit 1
-fi
+#######################################
+# Validates script prerequisites
+#######################################
+_validate_prerequisites() {
+  if [[ -z "$1" ]]; then
+    _error_exit "Revision message required\nUsage: $SCRIPT_NAME \"Your revision message\"" 2
+  fi
 
-if [ ! -f $ENV_PATH ]; then
-  echo ".env file not found at $ENV_PATH."
-  exit 1
-fi
+  if ! command -v alembic >/dev/null 2>&1; then
+    _error_exit "Alembic not found. Please install with:\n  pip install alembic"
+  fi
 
-ORIGINAL_HOST=$(grep DB_HOST $ENV_PATH | cut -d '=' -f2)
+  if [[ ! -d "alembic" ]]; then
+    _error_exit "Alembic directory not found. Run 'alembic init alembic' first."
+  fi
+}
 
-sed -i 's/DB_HOST=.*/DB_HOST=localhost/' $ENV_PATH
+#######################################
+# Creates versions directory if missing
+#######################################
+_ensure_versions_directory() {
+  local versions_dir="alembic/versions"
 
-set -o allexport
-. $ENV_PATH
-set +o allexport
+  if [[ ! -d "$versions_dir" ]]; then
+    _log_info "Creating versions directory..."
+    mkdir -p "$versions_dir" || _error_exit "Failed to create versions directory"
+  fi
+}
 
-echo "Running Alembic revision..."
-poetry run alembic revision --autogenerate -m "$REVISION_NAME"
-REVISION_EXIT_CODE=$?
+#######################################
+# Creates new alembic revision
+# Arguments:
+#   $1 - Revision message
+#######################################
+_create_revision() {
+  local msg="$1"
 
-if [ $REVISION_EXIT_CODE -ne 0 ]; then
-  echo "Alembic revision command failed. Exiting..."
-  exit $REVISION_EXIT_CODE
-fi
+  _log_info "Creating revision: \"$msg\""
+  if alembic revision --autogenerate -m "$msg"; then
+    local latest_revision=$(ls -1t alembic/versions/ | head -n 1)
+    _log_info "Successfully created revision: ${latest_revision}"
+  else
+    _error_exit "Revision creation failed"
+  fi
+}
 
-unset DB_HOST DB_PORT DB_NAME DB_USER DB_PASS SERVER_PORT
+#######################################
+# Main execution
+#######################################
+_main() {
+  _validate_prerequisites "$@"
+  _ensure_versions_directory
+  _create_revision "$1"
+}
 
-echo "Stopping PostgreSQL container..."
-docker compose -f $DOCKER_COMPOSE_PATH down postgres_simulation
-if [ $? -ne 0 ]; then
-  echo "Failed to stop PostgreSQL container."
-  exit 1
-fi
-
-sed -i "s/DB_HOST=.*/DB_HOST=${ORIGINAL_HOST}/" $ENV_PATH
-
-echo "Pipeline completed."
+_main "$@"

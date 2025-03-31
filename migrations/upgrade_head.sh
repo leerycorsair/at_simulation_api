@@ -1,48 +1,99 @@
 #!/bin/bash
+# Upgrades database to the latest Alembic revision
+# Usage: ./upgrade_head.sh
 
-echo "Starting Alembic upgrade script..."
+set -eo pipefail  # Exit on error and pipeline failures
+shopt -s nullglob # Prevent globbing from returning literal patterns
 
-ENV_PATH="./docker/local/.env"
-DOCKER_COMPOSE_PATH="./docker/local/docker-compose.yml"
+readonly GREEN='\033[0;32m'
+readonly RED='\033[0;31m'
+readonly NC='\033[0m' # No Color
 
-echo "Starting PostgreSQL container..."
-docker compose -f $DOCKER_COMPOSE_PATH up -d postgres_simulation
-if [ $? -ne 0 ]; then
-  echo "Failed to start PostgreSQL container."
-  exit 1
-fi
+#######################################
+# Logs an error message and exits
+# Arguments:
+#   $1 - Error message
+#   $2 - Exit code (optional, default: 1)
+#######################################
+_error_exit() {
+    echo -e "${RED}ERROR: ${1}${NC}" >&2
+    exit "${2:-1}"
+}
 
-if [ ! -f $ENV_PATH ]; then
-  echo ".env file not found at $ENV_PATH."
-  exit 1
-fi
+#######################################
+# Logs an informational message
+# Arguments:
+#   $1 - Message to display
+#######################################
+_log_info() {
+    echo -e "${GREEN}INFO: ${1}${NC}"
+}
 
-ORIGINAL_HOST=$(grep DB_HOST $ENV_PATH | cut -d '=' -f2)
+#######################################
+# Validates script prerequisites
+#######################################
+_validate_prerequisites() {
+    if ! command -v alembic >/dev/null 2>&1; then
+        _error_exit "Alembic not found. Please install with:\n  pip install alembic"
+    fi
 
-sed -i 's/DB_HOST=.*/DB_HOST=localhost/' $ENV_PATH
+    if [[ ! -d "alembic" ]]; then
+        _error_exit "Alembic directory not found. Run 'alembic init alembic' first."
+    fi
 
-set -o allexport
-. $ENV_PATH
-set +o allexport
+    if [[ ! -d "alembic/versions" ]]; then
+        _error_exit "No versions directory found. Create your first revision first."
+    fi
 
-echo "Running Alembic upgrade to head..."
-poetry run alembic upgrade head
-UPGRADE_EXIT_CODE=$?
+    local migration_count=$(ls -1 alembic/versions/*.py 2>/dev/null | wc -l)
+    if [[ $migration_count -eq 0 ]]; then
+        _error_exit "No migration files found in versions directory."
+    fi
+}
 
-if [ $UPGRADE_EXIT_CODE -ne 0 ]; then
-  echo "Alembic upgrade command failed. Exiting..."
-  exit $UPGRADE_EXIT_CODE
-fi
+#######################################
+# Gets current database revision
+#######################################
+_get_current_revision() {
+    alembic current 2>&1 | awk '{print $1}'
+}
 
-unset DB_HOST DB_PORT DB_NAME DB_USER DB_PASS SERVER_PORT
+#######################################
+# Gets head revision
+#######################################
+_get_head_revision() {
+    alembic heads | awk '{print $1}'
+}
 
-echo "Stopping PostgreSQL container..."
-docker compose -f $DOCKER_COMPOSE_PATH down postgres_simulation
-if [ $? -ne 0 ]; then
-  echo "Failed to stop PostgreSQL container."
-  exit 1
-fi
+#######################################
+# Performs the database upgrade
+#######################################
+_perform_upgrade() {
+    local current_rev=$(_get_current_revision)
+    local head_rev=$(_get_head_revision)
 
-sed -i "s/DB_HOST=.*/DB_HOST=${ORIGINAL_HOST}/" $ENV_PATH
+    if [[ "$current_rev" == "$head_rev" ]]; then
+        _log_info "Database is already at the latest revision (${head_rev})"
+        return 0
+    fi
 
-echo "Upgrade pipeline completed successfully."
+    _log_info "Current revision: ${current_rev:-<base>}"
+    _log_info "Upgrading to head revision: ${head_rev}"
+
+    if alembic upgrade head; then
+        _log_info "Successfully upgraded database to head revision"
+        return 0
+    else
+        _error_exit "Database upgrade failed"
+    fi
+}
+
+#######################################
+# Main execution
+#######################################
+_main() {
+    _validate_prerequisites
+    _perform_upgrade
+}
+
+_main "$@"
