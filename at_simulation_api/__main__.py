@@ -1,6 +1,10 @@
 import asyncio
 from contextlib import asynccontextmanager
 
+from at_simulation_api.config.cli_args import parse_args
+
+parse_args()
+
 import uvicorn
 from at_queue.core.session import ConnectionParameters
 from fastapi import Depends, FastAPI
@@ -8,7 +12,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from at_simulation_api.client.auth_client import AuthClientSingleton
-from at_simulation_api.config.cli_args import parse_args
 from at_simulation_api.config.rabbitmq import RabbitMQStore
 from at_simulation_api.config.server import ServerConfigurator
 from at_simulation_api.delivery.core.middleware.fastapi_exception_handler import (
@@ -68,7 +71,6 @@ app.exception_handler(RequestValidationError)(validation_exception_handler)
 
 
 if __name__ == "__main__":
-    parse_args()
     server_config = ServerConfigurator().get_server_config()
     uvicorn.run(
         app,
