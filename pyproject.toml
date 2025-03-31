@@ -3,7 +3,7 @@ name = "at_simulation_api"
 version = "0.1.0"
 description = ""
 authors = ["Leonov Vladislav <vladleonov21032002@gmail.com>"]
-packages = [{ include = "src" }, { include = "application.py" }]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -24,5 +24,3 @@ urllib3 = "^2.3.0"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 
-[tool.poetry.scripts]
-at_simulation_api = "application:app" 
