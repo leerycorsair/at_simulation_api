@@ -4,6 +4,7 @@ from typing import List
 from jinja2 import Environment, FileSystemLoader, Template
 
 from at_simulation_api.repository.editor.resource.models.models import (
+    ResourceAttributeDB,
     ResourceDB,
     ResourceTypeDB,
 )
@@ -38,17 +39,20 @@ def trnsl_resources(
 
 
 def to_resource_tr(resource: ResourceDB, resource_type: ResourceTypeDB) -> dict:
+    def _process_value(ra: ResourceAttributeDB):
+        if ra is None:
+            return None
+        if isinstance(ra.value, bool):
+            return str(ra.value).lower()
+        if isinstance(ra.value, str):
+            return ra.value.upper()
+        return ra.value
+
     attrs = [
         {
             "name": attr.name,
-            "value": (
-                (str(ra.value).lower() if isinstance(ra.value, bool) else ra.value)
-                if (
-                    ra := next(
-                        (ra for ra in resource.attributes if ra.rta_id == attr.id), None
-                    )
-                )
-                else None
+            "value": _process_value(
+                next((ra for ra in resource.attributes if ra.rta_id == attr.id), None)
             ),
         }
         for attr in resource_type.attributes
