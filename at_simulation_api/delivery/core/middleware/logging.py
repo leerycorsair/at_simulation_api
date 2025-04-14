@@ -48,6 +48,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                 {
                     "status_code": custom_error.status_code,
                     "error_message": str(custom_error),
+                    "error_details": custom_error.error_details,
                     "method": request.method,
                     "url": str(request.url),
                     "client_ip": client_ip,

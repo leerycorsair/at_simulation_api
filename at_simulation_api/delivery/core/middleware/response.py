@@ -14,6 +14,7 @@ class ResponseHelper:
     IS_ERROR = "is_error"
     STATUS_CODE = "status_code"
     ERROR_MESSAGE = "error_message"
+    ERROR_DETAILS = "error_details"
     DATA = "data"
 
     @staticmethod
@@ -89,6 +90,7 @@ class ResponseMiddleware(BaseHTTPMiddleware):
                     ResponseHelper.STATUS_CODE: e.status_code,
                     ResponseHelper.IS_ERROR: True,
                     ResponseHelper.ERROR_MESSAGE: e.http_error,
+                    ResponseHelper.ERROR_DETAILS: e.error_details,
                 },
             )
 
