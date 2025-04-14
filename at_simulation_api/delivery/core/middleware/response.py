@@ -14,7 +14,8 @@ class ResponseHelper:
     IS_ERROR = "is_error"
     STATUS_CODE = "status_code"
     ERROR_MESSAGE = "error_message"
-    ERROR_DETAILS = "error_details"
+    # TODO: ERROR_DETAILS = "data" -> ERROR_DETAILS = "error_details"  
+    ERROR_DETAILS = "data" 
     DATA = "data"
 
     @staticmethod
