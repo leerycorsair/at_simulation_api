@@ -1,10 +1,23 @@
 import json
 import logging
 
-from pygments import highlight
+from pygments import highlight, token
 from pygments.formatters import TerminalFormatter
 from pygments.lexers.data import JsonLexer
 from pythonjsonlogger import jsonlogger
+
+colorscheme = {
+    token.Token: ("", ""),  # Default
+    token.Whitespace: ("gray", "brightblack"),
+    token.Comment: ("gray", "brightblack"),
+    token.Comment.Preproc: ("cyan", "brightcyan"),
+    token.Keyword: ("blue", "brightblue"),
+    token.Keyword.Type: ("cyan", "brightcyan"),
+    token.Operator.Word: ("magenta", "brightmagenta"),
+    token.String: ("green", "brightgreen"),
+    token.Number: ("red", "brightred"),
+    token.Name: ("yellow", "yellow"),
+}
 
 
 def setup_logger(logger_name: str = "application_logger") -> logging.Logger:
@@ -19,7 +32,11 @@ def setup_logger(logger_name: str = "application_logger") -> logging.Logger:
             try:
                 parsed = json.loads(log_record)
                 formatted_json = json.dumps(parsed, indent=4)
-                return highlight(formatted_json, JsonLexer(), TerminalFormatter())
+                return highlight(
+                    formatted_json,
+                    JsonLexer(),
+                    TerminalFormatter(colorscheme=colorscheme),
+                )
             except Exception:
                 return log_record
 
