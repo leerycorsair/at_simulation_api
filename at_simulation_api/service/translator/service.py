@@ -104,7 +104,7 @@ class TranslatorService(metaclass=WrapMethodsMeta):
                     translate_logs=translate_logs,
                     stage=StagesEnum.COMPLETED,
                 )
-                
+
         except Error as e:
             raise e
 
