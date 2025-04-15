@@ -53,9 +53,12 @@ def to_ProcessDicts(processes: List[Process]) -> List[ProcessDict]:
 
 def to_TickDict(raw_data: dict) -> TickDict:
     try:
+        state = raw_data.get("current_state")
+        if state == 'PAUSED':
+            state = 'PAUSE'
         tick_data = TickDict(
             current_tick=raw_data.get("current_tick", 0),
-            current_state=ProcessStatusEnum(raw_data.get("current_state")),
+            current_state=ProcessStatusEnum(state),
             resources=[
                 ResourceDict(resource_name=resource["resource_name"])
                 for resource in raw_data.get("resources", [])
