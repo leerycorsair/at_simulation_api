@@ -3,7 +3,7 @@ import subprocess
 import tempfile
 from typing import List, Tuple
 
-from at_simulation_api.core.errors import WrapMethodsMeta
+from at_simulation_api.core.errors import BadRequestError, Error, WrapMethodsMeta
 from at_simulation_api.repository.minio.models.models import MinioFile
 from at_simulation_api.service.translator.dependencies import (
     IFileRepository,
@@ -49,11 +49,14 @@ class TranslatorService(metaclass=WrapMethodsMeta):
                 translate_logs += logs
                 if fmt_result != 0:
                     self._cleanup_files(temporary_files)
-                    return TranslateInfo(
-                        file_name="",
-                        file_content=rendered_model,
-                        translate_logs=translate_logs,
-                        stage=StagesEnum.FORMATTING,
+                    raise BadRequestError(
+                        "Failed to translate",
+                        error_details=TranslateInfo(
+                            file_name="",
+                            file_content=rendered_model,
+                            translate_logs=translate_logs,
+                            stage=StagesEnum.FORMATTING,
+                        ).model_dump(),
                     )
 
                 # Stage 2: Building
@@ -63,11 +66,14 @@ class TranslatorService(metaclass=WrapMethodsMeta):
                 temporary_files.append(file_path)
                 if build_result != 0:
                     self._cleanup_files(temporary_files)
-                    return TranslateInfo(
-                        file_name="",
-                        file_content=rendered_model,
-                        translate_logs=translate_logs,
-                        stage=StagesEnum.BUILDING,
+                    raise BadRequestError(
+                        "Failed to translate",
+                        error_details=TranslateInfo(
+                            file_name="",
+                            file_content=rendered_model,
+                            translate_logs=translate_logs,
+                            stage=StagesEnum.BUILDING,
+                        ).model_dump(),
                     )
 
                 # Stage 3: Linting
@@ -75,11 +81,14 @@ class TranslatorService(metaclass=WrapMethodsMeta):
                 translate_logs += logs
                 if lint_result != 0:
                     self._cleanup_files(temporary_files)
-                    return TranslateInfo(
-                        file_name="",
-                        file_content=rendered_model,
-                        translate_logs=translate_logs,
-                        stage=StagesEnum.LINTING,
+                    raise BadRequestError(
+                        "Failed to translate",
+                        error_details=TranslateInfo(
+                            file_name="",
+                            file_content=rendered_model,
+                            translate_logs=translate_logs,
+                            stage=StagesEnum.LINTING,
+                        ).model_dump(),
                     )
 
                 # Stage 4: Upload
@@ -95,6 +104,9 @@ class TranslatorService(metaclass=WrapMethodsMeta):
                     translate_logs=translate_logs,
                     stage=StagesEnum.COMPLETED,
                 )
+                
+        except Error as e:
+            raise e
 
         except Exception as e:
             raise ValueError(e)
