@@ -41,9 +41,9 @@ async def lifespan(app: FastAPI):
     simulation_worker = ATSimulationWorker(
         connection_parameters=connection_parameters,
         auth_client=auth_client,
-        model_service=Depends(get_model_service),
-        translator_service=Depends(get_translator_service),
-        processor_service=Depends(get_processor_service),
+        model_service=get_model_service(),
+        translator_service=get_translator_service(),
+        processor_service=get_processor_service(),
     )
 
     await simulation_worker.initialize()
