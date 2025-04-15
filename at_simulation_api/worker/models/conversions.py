@@ -60,7 +60,7 @@ def to_TickDict(raw_data: dict) -> TickDict:
             current_tick=raw_data.get("current_tick", 0),
             current_state=ProcessStatusEnum(state),
             resources=[
-                ResourceDict(resource_name=resource["resource_name"])
+                ResourceDict(**resource)
                 for resource in raw_data.get("resources", [])
             ],
             usages=[_parse_usage_dict(usage) for usage in raw_data.get("usages", [])],

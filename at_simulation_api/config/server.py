@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings
 
 class ServerConfig(BaseSettings):
     port: int = Field(..., alias="SERVER_PORT")
+    host: str = Field(alias="SERVER_HOST", default="0.0.0.0")
 
     class Config:
         extra = "allow"
