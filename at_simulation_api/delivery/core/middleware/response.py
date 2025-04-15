@@ -14,8 +14,8 @@ class ResponseHelper:
     IS_ERROR = "is_error"
     STATUS_CODE = "status_code"
     ERROR_MESSAGE = "error_message"
-    # TODO: ERROR_DETAILS = "data" -> ERROR_DETAILS = "error_details"  
-    ERROR_DETAILS = "data" 
+    # TODO: ERROR_DETAILS = "data" -> ERROR_DETAILS = "error_details"
+    ERROR_DETAILS = "data"
     DATA = "data"
 
     @staticmethod
@@ -55,7 +55,8 @@ class ResponseMiddleware(BaseHTTPMiddleware):
                     ResponseHelper.ERROR_MESSAGE: ResponseHelper.SUCCESS_MESSAGE,
                 }
                 wrapped_stream = ResponseHelper.wrap_stream_with_metadata(
-                    response.body_iterator, metadata
+                    response.body_iterator,
+                    metadata,
                 )
                 return StreamingResponse(
                     wrapped_stream,
