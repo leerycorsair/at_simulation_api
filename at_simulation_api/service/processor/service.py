@@ -1,9 +1,9 @@
 import asyncio
 import json
+import os
 import subprocess
 import uuid
 from typing import List
-import os
 
 from at_simulation_api.core.errors import ForbiddenError, NotFoundError, WrapMethodsMeta
 from at_simulation_api.service.processor.dependencies import IFileRepository
@@ -26,7 +26,9 @@ class ProcessorService(metaclass=WrapMethodsMeta):
         self, user_id: int, file_uuid: str, process_name: str
     ) -> Process:
         self._check_file_rights(user_id, file_uuid)
-        file_path = self._file_repository.fetch_file(file_uuid, os.getenv("FETCH_FILE_PATH","/bin"))
+        file_path = self._file_repository.fetch_file(
+            file_uuid, os.getenv("FETCH_FILE_PATH", "/bin")
+        )
 
         process_handle = subprocess.Popen(
             [file_path],
