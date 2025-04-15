@@ -16,7 +16,6 @@ class WebsocketManager(metaclass=WrapMethodsMeta):
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-
             async def initialize():
                 async with cls._lock:
                     if not cls._instance:
@@ -25,7 +24,15 @@ class WebsocketManager(metaclass=WrapMethodsMeta):
                         )
                         cls._instance._initialize()
 
-            asyncio.run(initialize())
+            try:
+                # Пытаемся получить текущий цикл событий
+                loop = asyncio.get_running_loop()
+                # Если цикл существует, создаем задачу в нем
+                loop.create_task(initialize())
+            except RuntimeError:
+                # Если цикла нет, используем asyncio.run()
+                asyncio.run(initialize())
+                
         return cls._instance
 
     def _initialize(self):
