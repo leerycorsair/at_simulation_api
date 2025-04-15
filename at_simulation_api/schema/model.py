@@ -1,6 +1,14 @@
 from datetime import datetime
 
-from sqlalchemy import TIMESTAMP, Column, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    TIMESTAMP,
+    UUID,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from .base import Base
@@ -30,3 +38,12 @@ class Model(Base):
             name="uix_model_name_user_id",
         ),
     )
+
+class TranslatedModels(Base):
+    __tablename__ = "translated_models"
+    
+    file_uuid = Column(UUID, primary_key=True)
+    file_name = Column(String, nullable=False)
+    created_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
+    
+    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
