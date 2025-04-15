@@ -1,6 +1,9 @@
 import json
 import logging
 
+from pygments import highlight
+from pygments.formatters import TerminalFormatter
+from pygments.lexers.data import JsonLexer
 from pythonjsonlogger import jsonlogger
 
 
@@ -14,7 +17,9 @@ def setup_logger(logger_name: str = "application_logger") -> logging.Logger:
         def format(self, record):
             log_record = super().format(record)
             try:
-                return json.dumps(json.loads(log_record), indent=4)
+                parsed = json.loads(log_record)
+                formatted_json = json.dumps(parsed, indent=4)
+                return highlight(formatted_json, JsonLexer(), TerminalFormatter())
             except Exception:
                 return log_record
 

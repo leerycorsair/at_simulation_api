@@ -28,6 +28,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         client_ip = request.client.host if request.client else "unknown"
         client_port = request.client.port if request.client else "unknown"
+        request_body = await request.json() if await request.body() else "empty"
         try:
             response = await call_next(request)
 
@@ -38,6 +39,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                     "url": str(request.url),
                     "client_ip": client_ip,
                     "client_port": client_port,
+                    "request_body": request_body,
                 },
                 level="info",
             )
@@ -54,6 +56,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                     "client_ip": client_ip,
                     "client_port": client_port,
                     "headers": redact_headers(request.headers),
+                    "request_body": await request.body(),
                 },
                 level="error",
             )
@@ -70,6 +73,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                     "client_ip": client_ip,
                     "client_port": client_port,
                     "headers": redact_headers(request.headers),
+                    "request_body": await request.body(),
                     "trace": traceback.format_exc(),
                 },
                 level="error",
