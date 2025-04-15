@@ -80,5 +80,6 @@ if __name__ == "__main__":
     server_config = ServerConfigurator().get_server_config()
     uvicorn.run(
         app,
+        host="0.0.0.0",
         port=server_config.port,
     )
