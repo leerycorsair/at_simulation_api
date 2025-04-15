@@ -2,6 +2,7 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from at_simulation_api.config.cli_args import parse_args
+from at_simulation_api import utils
 
 parse_args()
 
@@ -39,9 +40,9 @@ async def lifespan(app: FastAPI):
     rabbitmq_config = RabbitMQStore.get_rabbitmq_config()
     connection_parameters = ConnectionParameters(rabbitmq_config.url)
 
-    model_service = get_model_service(...)
-    translator_service = get_translator_service(...)
-    processor_service = get_processor_service(...)
+    model_service = await utils.resolve_dependency(get_model_service)
+    translator_service = await utils.resolve_dependency(get_translator_service)
+    processor_service = await utils.resolve_dependency(get_processor_service)
 
     simulation_worker = ATSimulationWorker(
         connection_parameters=connection_parameters,
@@ -79,6 +80,5 @@ if __name__ == "__main__":
     server_config = ServerConfigurator().get_server_config()
     uvicorn.run(
         app,
-        host="0.0.0.0",
         port=server_config.port,
     )
