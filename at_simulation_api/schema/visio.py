@@ -58,15 +58,6 @@ class Node(Base):
         "Edge", cascade="all, delete-orphan", foreign_keys="[Edge.to_node]"
     )
 
-    __table_args__ = (
-        UniqueConstraint(
-            "object_name",
-            "object_table",
-            "model_id",
-            name="uix_object_name_object_table_model_id",
-        ),
-    )
-
 
 def delete_associated_node(mapper, connection: Connection, target):
     node_ids = connection.execute(
