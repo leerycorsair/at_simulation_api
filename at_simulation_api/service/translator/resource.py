@@ -39,20 +39,22 @@ def trnsl_resources(
 
 
 def to_resource_tr(resource: ResourceDB, resource_type: ResourceTypeDB) -> dict:
-    def _process_value(ra: ResourceAttributeDB):
+    def _process_value(ra: ResourceAttributeDB, attr_name: str):
         if ra is None:
             return None
         if isinstance(ra.value, bool):
             return str(ra.value).lower()
         if isinstance(ra.value, str):
-            return ra.value.upper()
+            _enum_prefix = f"{resource_type.name.capitalize()}{attr_name.capitalize()}"
+            return _enum_prefix + ra.value.upper()
         return ra.value
 
     attrs = [
         {
             "name": attr.name,
             "value": _process_value(
-                next((ra for ra in resource.attributes if ra.rta_id == attr.id), None)
+                next((ra for ra in resource.attributes if ra.rta_id == attr.id), None),
+                attr.name,
             ),
         }
         for attr in resource_type.attributes
