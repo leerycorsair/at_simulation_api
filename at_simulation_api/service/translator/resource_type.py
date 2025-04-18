@@ -56,11 +56,11 @@ def to_resource_type_tr(resource_type: ResourceTypeDB) -> dict:
 def to_enum_tr(
     resource_type_name: str, attr_name: str, enum_values_set: List[str]
 ) -> dict:
-    _enum_prefix = f"{resource_type_name.capitalize()}{attr_name.capitalize()}"
+    _enum_prefix = f"{resource_type_name.upper()}_{attr_name.upper()}"
     enum_name = _enum_prefix + "Enum"
 
     for i in range(len(enum_values_set)):
-        enum_values_set[i] += _enum_prefix
+        enum_values_set[i] = f"{_enum_prefix}_{enum_values_set[i]}"
 
     return {
         "name": enum_name,
