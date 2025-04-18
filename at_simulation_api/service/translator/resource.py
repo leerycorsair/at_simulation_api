@@ -45,8 +45,8 @@ def to_resource_tr(resource: ResourceDB, resource_type: ResourceTypeDB) -> dict:
         if isinstance(ra.value, bool):
             return str(ra.value).lower()
         if isinstance(ra.value, str):
-            _enum_prefix = f"{resource_type.name.upper()}{attr_name.upper()}"
-            return f"{_enum_prefix} + {ra.value.upper()}"
+            _enum_prefix = f"{resource_type.name.upper()}_{attr_name.upper()}"
+            return f"{_enum_prefix}_{ra.value.upper()}"
         return ra.value
 
     attrs = [

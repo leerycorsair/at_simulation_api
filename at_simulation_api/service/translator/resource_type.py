@@ -39,7 +39,7 @@ def to_resource_type_tr(resource_type: ResourceTypeDB) -> dict:
         {
             "name": attr.name,
             "go_type": (
-                f"{resource_type.name.capitalize()}{attr.name.capitalize()}Enum"
+                f"{resource_type.name.upper()}_{attr.name.upper()}_ENUM"
                 if attr.type == "ENUM"
                 else TYPE_MAPPING.get(attr.type, "interface{}")
             ),
@@ -57,7 +57,7 @@ def to_enum_tr(
     resource_type_name: str, attr_name: str, enum_values_set: List[str]
 ) -> dict:
     _enum_prefix = f"{resource_type_name.upper()}_{attr_name.upper()}"
-    enum_name = _enum_prefix + "Enum"
+    enum_name = f"{_enum_prefix}_ENUM"
 
     for i in range(len(enum_values_set)):
         enum_values_set[i] = f"{_enum_prefix}_{enum_values_set[i]}"
