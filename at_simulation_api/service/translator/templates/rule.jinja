@@ -1,4 +1,4 @@
-type {{ template_name }} struct {
+type Template_{{ template_name }} struct {
 	UsageName string
 	HasTriggered bool
 
@@ -7,7 +7,7 @@ type {{ template_name }} struct {
 	{% endfor %}
 }
 
-func (t *{{ template_name }}) Execute() {
+func (t *Template_{{ template_name }}) Execute() {
 	if {{ condition }} {
 		{{ body }}
 
@@ -18,7 +18,7 @@ func (t *{{ template_name }}) Execute() {
 	t.HasTriggered = false
 }
 
-func (t *{{ template_name }}) MarshalJSON() ([]byte, error) {
+func (t *Template_{{ template_name }}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"usage_name":    t.UsageName,
 		"has_triggered": t.HasTriggered,

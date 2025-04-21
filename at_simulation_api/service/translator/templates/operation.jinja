@@ -1,4 +1,4 @@
-type {{ template_name }} struct {
+type Template_{{ template_name }} struct {
 	UsageName string
 	HasTriggeredBefore bool
 	HasTriggeredAfter bool
@@ -11,7 +11,7 @@ type {{ template_name }} struct {
 	{% endfor %}
 }
 
-func (t *{{ template_name }}) Execute() {
+func (t *Template_{{ template_name }}) Execute() {
 	if t.CurrentTick > t.Duration {
 		{{ body_after }}
 
@@ -34,7 +34,7 @@ func (t *{{ template_name }}) Execute() {
 	t.HasTriggeredAfter = false
 }
 
-func (t *{{ template_name }}) MarshalJSON() ([]byte, error) {
+func (t *Template_{{ template_name }}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"usage_name":    t.UsageName,
 		"has_triggered_before": t.HasTriggeredBefore,

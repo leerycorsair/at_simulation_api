@@ -1,4 +1,4 @@
-type {{ template_name }} struct {
+type Template_{{ template_name }} struct {
 	UsageName string
 	HasTriggered bool
 	TicksRemaining int
@@ -8,7 +8,7 @@ type {{ template_name }} struct {
 	{% endfor %}
 }
 
-func (t *{{ template_name }}) Execute() {
+func (t *Template_{{ template_name }}) Execute() {
 	if t.TicksRemaining <= 0 {
 		t.TicksRemaining = t.generator_func({{ generator_value }}, {{ generator_dispersion }})
 	}
@@ -25,7 +25,7 @@ func (t *{{ template_name }}) Execute() {
 	t.HasTriggered = false
 }
 
-func (t *{{ template_name }}) generator_func(generator_value, generator_dispersion float64) int {
+func (t *Template_{{ template_name }}) generator_func(generator_value, generator_dispersion float64) int {
 	{% if generator_type == "NORMAL" %}
 	min := generator_value - generator_dispersion
 	max := generator_value + generator_dispersion
@@ -67,7 +67,7 @@ func (t *{{ template_name }}) generator_func(generator_value, generator_dispersi
 	{% endif %}
 }
 
-func (t *{{ template_name }}) MarshalJSON() ([]byte, error) {
+func (t *Template_{{ template_name }}) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
 		"usage_name":    t.UsageName,
 		"has_triggered": t.HasTriggered,
