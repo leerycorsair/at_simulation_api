@@ -8,7 +8,7 @@ const (
 )
 {% endfor %}
 
-type {{ resource_type.name }} struct {
+type ResourceType_{{ resource_type.name }} struct {
     ResourceName string `json:"resource_name"`
     ToBeTraced bool `json:"-"`
     {% for attribute in resource_type.attributes %}
@@ -16,7 +16,7 @@ type {{ resource_type.name }} struct {
     {% endfor %}
 }
 
-func (r {{ resource_type.name }}) MarshalJSON() ([]byte, error) {
+func (r ResourceType_{{ resource_type.name }}) MarshalJSON() ([]byte, error) {
     if !r.ToBeTraced {
         return []byte("null"), nil
     }
