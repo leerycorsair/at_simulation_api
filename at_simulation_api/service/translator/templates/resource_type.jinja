@@ -3,7 +3,7 @@ type {{ enum.name }} string
 
 const (
     {% for value in enum["values"] %}
-    {{ enum_prefix }}_{{ value }} {{ enum.name }} = "{{ value }}"
+    {{ enum.enum_prefix }}_{{ value }} {{ enum.name }} = "{{ value }}"
     {% endfor %}
 )
 {% endfor %}
