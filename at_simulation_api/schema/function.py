@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from at_simulation_api.schema.base import Base
 
@@ -7,13 +7,33 @@ from at_simulation_api.schema.base import Base
 class Function(Base):
     __tablename__ = "functions"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    ret_type = Column(String, nullable=False)
-    body = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    ret_type: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    body: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
 
-    parameters = relationship("FunctionParameter", cascade="all, delete-orphan")
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    parameters = relationship(
+        "FunctionParameter",
+        cascade="all, delete-orphan",
+    )
+    model_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("models.id"),
+        nullable=False,
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -27,11 +47,25 @@ class Function(Base):
 class FunctionParameter(Base):
     __tablename__ = "function_parameters"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    type = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    type: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
 
-    function_id = Column(Integer, ForeignKey("functions.id"), nullable=False)
+    function_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("functions.id"),
+        nullable=False,
+    )
 
     __table_args__ = (
         UniqueConstraint(
