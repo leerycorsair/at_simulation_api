@@ -1,16 +1,7 @@
 import enum
 
-from sqlalchemy import (
-    Column,
-    Enum,
-    Float,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import relationship
+from sqlalchemy import Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from at_simulation_api.schema.base import Base
 
@@ -24,19 +15,49 @@ class TemplateTypeEnum(enum.Enum):
 class Template(Base):
     __tablename__ = "templates"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    type = Column(Enum(TemplateTypeEnum), nullable=False)
-
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
-    relevant_resources = relationship("RelevantResource", cascade="all, delete")
-    template_usages = relationship("TemplateUsage", cascade="all, delete")
-    irregular_event_bodies = relationship("IrregularEventBody", cascade="all, delete")
-    irregular_event_generators = relationship(
-        "IrregularEventGenerator", cascade="all, delete"
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
     )
-    operation_bodies = relationship("OperationBody", cascade="all, delete")
-    rule_bodies = relationship("RuleBody", cascade="all, delete")
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    type: Mapped[TemplateTypeEnum] = mapped_column(
+        Enum(TemplateTypeEnum),
+        nullable=False,
+    )
+
+    model_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("models.id"),
+        nullable=False,
+    )
+    relevant_resources = relationship(
+        "RelevantResource",
+        cascade="all, delete",
+    )
+    template_usages = relationship(
+        "TemplateUsage",
+        cascade="all, delete",
+    )
+    irregular_event_bodies = relationship(
+        "IrregularEventBody",
+        cascade="all, delete",
+    )
+    irregular_event_generators = relationship(
+        "IrregularEventGenerator",
+        cascade="all, delete",
+    )
+    operation_bodies = relationship(
+        "OperationBody",
+        cascade="all, delete",
+    )
+    rule_bodies = relationship(
+        "RuleBody",
+        cascade="all, delete",
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -50,12 +71,31 @@ class Template(Base):
 class RelevantResource(Base):
     __tablename__ = "relevant_resources"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
 
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
-    resource_type_id = Column(Integer, ForeignKey("resource_types.id"), nullable=False)
-    template_usage_args = relationship("TemplateUsageArgument", cascade="all, delete")
+    template_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("templates.id"),
+        nullable=False,
+    )
+    resource_type_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("resource_types.id"),
+        nullable=False,
+    )
+    
+    template_usage_args = relationship(
+        "TemplateUsageArgument",
+        cascade="all, delete",
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -69,12 +109,30 @@ class RelevantResource(Base):
 class TemplateUsage(Base):
     __tablename__ = "template_usages"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-
-    template_id = Column(Integer, ForeignKey("templates.id"), nullable=False)
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
-    template_usage_args = relationship("TemplateUsageArgument", cascade="all, delete")
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    template_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("templates.id"),
+        nullable=False,
+    )
+    model_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("models.id"),
+        nullable=False,
+    )
+    
+    template_usage_args = relationship(
+        "TemplateUsageArgument",
+        cascade="all, delete",
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -87,24 +145,40 @@ class TemplateUsage(Base):
 class TemplateUsageArgument(Base):
     __tablename__ = "template_usage_args"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    relevant_resource_id = Column(
-        Integer, ForeignKey("relevant_resources.id"), nullable=False
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
     )
-    template_usage_id = Column(
-        Integer, ForeignKey("template_usages.id"), nullable=False
+    relevant_resource_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("relevant_resources.id"),
+        nullable=False,
     )
-    resource_id = Column(Integer, ForeignKey("resources.id"), nullable=False)
+    template_usage_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("template_usages.id"),
+        nullable=False,
+    )
+    resource_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("resources.id"),
+        nullable=False,
+    )
 
 
 class IrregularEventBody(Base):
     __tablename__ = "irregular_event_bodies"
 
-    body = Column(Text, nullable=False)
-
-    template_id = Column(
-        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    body: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    template_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("templates.id"),
+        primary_key=True,
+        nullable=False,
     )
 
 
@@ -120,34 +194,67 @@ class IrregularEventGeneratorTypeEnum(enum.Enum):
 class IrregularEventGenerator(Base):
     __tablename__ = "irregular_event_generators"
 
-    type = Column(Enum(IrregularEventGeneratorTypeEnum), nullable=False)
-    value = Column(Float, nullable=False)
-    dispersion = Column(Float, nullable=False)
-
-    template_id = Column(
-        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    type: Mapped[IrregularEventGeneratorTypeEnum] = mapped_column(
+        Enum(IrregularEventGeneratorTypeEnum),
+        nullable=False,
+    )
+    value: Mapped[float] = mapped_column(
+        Float,
+        nullable=False,
+    )
+    dispersion: Mapped[float] = mapped_column(
+        Float,
+        nullable=False,
+    )
+    template_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("templates.id"),
+        primary_key=True,
+        nullable=False,
     )
 
 
 class OperationBody(Base):
     __tablename__ = "operation_bodies"
 
-    condition = Column(Text, nullable=False)
-    body_before = Column(Text, nullable=False)
-    delay = Column(Integer, nullable=False)
-    body_after = Column(Text, nullable=False)
-
-    template_id = Column(
-        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    condition: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    body_before: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    delay: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    body_after: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    template_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("templates.id"),
+        primary_key=True,
+        nullable=False,
     )
 
 
 class RuleBody(Base):
     __tablename__ = "rule_bodies"
 
-    condition = Column(Text, nullable=False)
-    body = Column(Text, nullable=False)
-
-    template_id = Column(
-        Integer, ForeignKey("templates.id"), primary_key=True, nullable=False
+    condition: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    body: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    template_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("templates.id"),
+        primary_key=True,
+        nullable=False,
     )

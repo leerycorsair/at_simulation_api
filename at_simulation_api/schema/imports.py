@@ -1,17 +1,35 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from at_simulation_api.schema.base import Base
 
 
 class Import(Base):
     __tablename__ = "imports"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    version = Column(String, nullable=True)
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
-    packages = relationship("Package", cascade="all, delete-orphan")
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    version: Mapped[str] = mapped_column(
+        String,
+        nullable=True,
+    )
+    model_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("models.id"),
+        nullable=False,
+    )
+    
+    packages = relationship(
+        "Package",
+        cascade="all, delete-orphan",
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -25,11 +43,25 @@ class Import(Base):
 class Package(Base):
     __tablename__ = "packages"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    alias = Column(String, nullable=True)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    alias: Mapped[str] = mapped_column(
+        String,
+        nullable=True,
+    )
 
-    import_id = Column(Integer, ForeignKey("imports.id"), nullable=False)
+    import_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("imports.id"),
+        nullable=False,
+    )
 
     __table_args__ = (
         UniqueConstraint(

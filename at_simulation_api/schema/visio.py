@@ -1,23 +1,13 @@
 import enum
 
-from sqlalchemy import (
-    CheckConstraint,
-    Column,
-    Enum,
-    ForeignKey,
-    Integer,
-    String,
-    UniqueConstraint,
-    event,
-)
+from sqlalchemy import CheckConstraint, Enum, ForeignKey, Integer, String, event
 from sqlalchemy.engine import Connection
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from at_simulation_api.schema.base import Base
 from at_simulation_api.schema.function import Function
 from at_simulation_api.schema.resource import Resource, ResourceType
 from at_simulation_api.schema.template import Template, TemplateUsage
-
-from .base import Base
 
 
 class NodeType(enum.Enum):
@@ -38,18 +28,52 @@ class NodeType(enum.Enum):
 class Node(Base):
     __tablename__ = "nodes"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    object_table = Column(String, nullable=False)
-    object_name = Column(String, nullable=False)
-    object_id = Column(Integer, nullable=False)
-    node_type = Column(Enum(NodeType), nullable=False)
-    pos_x = Column(Integer, nullable=False)
-    pos_y = Column(Integer, nullable=False)
-    width = Column(Integer, nullable=False)
-    height = Column(Integer, nullable=False)
-    color = Column(String, nullable=False)
-
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    object_table: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    object_name: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    object_id: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    node_type: Mapped[NodeType] = mapped_column(
+        Enum(NodeType),
+        nullable=False,
+    )
+    pos_x: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    pos_y: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    width: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    height: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+    color: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    model_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("models.id"),
+        nullable=False,
+    )
 
     edges_from = relationship(
         "Edge", cascade="all, delete-orphan", foreign_keys="[Edge.from_node]"
@@ -89,17 +113,36 @@ event.listen(Function, "after_delete", delete_associated_node)
 class Edge(Base):
     __tablename__ = "edges"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    from_node = Column(Integer, ForeignKey("nodes.id"), nullable=False)
-    to_node = Column(Integer, ForeignKey("nodes.id"), nullable=False)
-    model_id = Column(Integer, ForeignKey("models.id"), nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+    from_node: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("nodes.id"),
+        nullable=False,
+    )
+    to_node: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("nodes.id"),
+        nullable=False,
+    )
+    model_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("models.id"),
+        nullable=False,
+    )
 
     from_node_relation = relationship(
-        "Node", foreign_keys=[from_node], cascade="all, delete"
+        "Node",
+        foreign_keys=[from_node],
+        cascade="all, delete",
     )
     to_node_relation = relationship(
-        "Node", foreign_keys=[to_node], cascade="all, delete"
+        "Node",
+        foreign_keys=[to_node],
+        cascade="all, delete",
     )
 
     __table_args__ = (

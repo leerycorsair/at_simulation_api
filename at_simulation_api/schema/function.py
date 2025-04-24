@@ -24,15 +24,15 @@ class Function(Base):
         Text,
         nullable=False,
     )
-
-    parameters = relationship(
-        "FunctionParameter",
-        cascade="all, delete-orphan",
-    )
     model_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("models.id"),
         nullable=False,
+    )
+
+    parameters = relationship(
+        "FunctionParameter",
+        cascade="all, delete-orphan",
     )
 
     __table_args__ = (
