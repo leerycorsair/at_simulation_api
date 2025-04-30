@@ -190,7 +190,8 @@ class TemplateRepository:
         for arg in template_usage.arguments:
             existing_arg = (
                 self.db_session.query(TemplateUsageArgument)
-                .filter_by(id=arg.id)
+                .filter_by(relevant_resource_id=arg.relevant_resource_id)
+                .filter_by(resource_id = arg.resource_id)
                 .first()
             )
             if existing_arg:
