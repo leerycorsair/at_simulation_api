@@ -1,19 +1,18 @@
 """init
 
-Revision ID: e8ccdac846dc
+Revision ID: 9c97ca0dadd0
 Revises: 
-Create Date: 2025-01-12 14:25:40.885283
+Create Date: 2025-04-30 07:00:14.353354
 
 """
 from typing import Sequence, Union
 
+from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
-from alembic import op
-
 # revision identifiers, used by Alembic.
-revision: str = 'e8ccdac846dc'
+revision: str = '9c97ca0dadd0'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,7 +26,6 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name'),
     sa.UniqueConstraint('name', 'user_id', name='uix_model_name_user_id')
     )
     op.create_table('functions',
@@ -39,6 +37,15 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['model_id'], ['models.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name', 'model_id', name='uix_function_name_model_id')
+    )
+    op.create_table('imports',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('version', sa.String(), nullable=True),
+    sa.Column('model_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['model_id'], ['models.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name', 'model_id', name='uix_import_name_model_id')
     )
     op.create_table('nodes',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -53,8 +60,7 @@ def upgrade() -> None:
     sa.Column('color', sa.String(), nullable=False),
     sa.Column('model_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['model_id'], ['models.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('object_name', 'object_table', 'model_id', name='uix_object_name_object_table_model_id')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('resource_types',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -117,6 +123,16 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['template_id'], ['templates.id'], ),
     sa.PrimaryKeyConstraint('template_id')
     )
+    op.create_table('packages',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('alias', sa.String(), nullable=True),
+    sa.Column('import_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['import_id'], ['imports.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('alias', 'import_id', name='uix_package_alias_import_id'),
+    sa.UniqueConstraint('name', 'import_id', name='uix_package_name_import_id')
+    )
     op.create_table('relevant_resources',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=False),
@@ -168,7 +184,7 @@ def upgrade() -> None:
     )
     op.create_table('resource_attributes',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('value', sa.String(), nullable=False),
+    sa.Column('value', sa.JSON(), nullable=False),
     sa.Column('resource_id', sa.Integer(), nullable=False),
     sa.Column('rta_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['resource_id'], ['resources.id'], ),
@@ -197,6 +213,7 @@ def downgrade() -> None:
     op.drop_table('resources')
     op.drop_table('resource_type_attributes')
     op.drop_table('relevant_resources')
+    op.drop_table('packages')
     op.drop_table('operation_bodies')
     op.drop_table('irregular_event_generators')
     op.drop_table('irregular_event_bodies')
@@ -205,6 +222,7 @@ def downgrade() -> None:
     op.drop_table('templates')
     op.drop_table('resource_types')
     op.drop_table('nodes')
+    op.drop_table('imports')
     op.drop_table('functions')
     op.drop_table('models')
     # ### end Alembic commands ###

@@ -36,27 +36,27 @@ class Template(Base):
     )
     relevant_resources = relationship(
         "RelevantResource",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
     template_usages = relationship(
         "TemplateUsage",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
     irregular_event_bodies = relationship(
         "IrregularEventBody",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
     irregular_event_generators = relationship(
         "IrregularEventGenerator",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
     operation_bodies = relationship(
         "OperationBody",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
     rule_bodies = relationship(
         "RuleBody",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
 
     __table_args__ = (
@@ -131,7 +131,7 @@ class TemplateUsage(Base):
     
     template_usage_args = relationship(
         "TemplateUsageArgument",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
 
     __table_args__ = (

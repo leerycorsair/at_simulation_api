@@ -6,13 +6,14 @@ services:
     container_name: at_rabbitmq
     image: "rabbitmq:management"
     ports:
-      - "${RABBITMQ_UI_PORT}:15672"  
-      - "${RABBITMQ_PORT}:5672"    
+      - "${RABBITMQ_UI_PORT}:${RABBITMQ_UI_PORT}"  
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"    
     networks:
       - custom-network
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_LOGIN}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_NODE_PORT: ${RABBITMQ_PORT}
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_running"]
       interval: 5s
