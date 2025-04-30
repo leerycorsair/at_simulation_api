@@ -7,7 +7,7 @@ type Template_{{ template_name }} struct {
 	IsActive bool
 
 	{% for param in params %}
-	{{ param.name }} *{{ param.type }}
+	{{ param.name }} *ResourceType_{{ param.type }}
 	{% endfor %}
 }
 
