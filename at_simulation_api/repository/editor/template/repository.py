@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, Tuple, TypeVar
+from typing import Any, Callable, List, Optional, Set, Tuple, TypeVar
 
 from sqlalchemy.orm import Session
 
@@ -245,15 +245,46 @@ class TemplateRepository:
     def _update_relevant_resources(
         self, template_id: int, rel_resources: List[RelevantResourceDB]
     ) -> None:
-        self._delete_template_relevant_resources(template_id)
-        self._create_relevant_resources(template_id, rel_resources)
-
-    def _delete_template_relevant_resources(self, template_id: int) -> None:
-        (
+        existing_rel_resources = (
             self.db_session.query(RelevantResource)
             .filter(RelevantResource.template_id == template_id)
-            .delete(synchronize_session=False)
+            .all()
         )
+
+        rel_resources_all: Set[RelevantResource] = set(existing_rel_resources)
+        rel_resources_to_create: Set[RelevantResourceDB] = set()
+        rel_resources_to_not_change: Set[RelevantResource] = set()
+        for rel_resource in rel_resources:
+            found = False
+
+            for existing_rel_resource in existing_rel_resources:
+                if (
+                    rel_resource.name == existing_rel_resource.name
+                    and rel_resource.resource_type_id == existing_rel_resource
+                ):
+                    found = True
+                    rel_resources_to_not_change.add(existing_rel_resource)
+                    break
+
+            if not found:
+                rel_resources_to_create.add(rel_resource)
+        rel_resources_to_delete = rel_resources_all.difference(
+            rel_resources_to_not_change,
+        )
+
+        self._delete_template_relevant_resources(list(rel_resources_to_delete))
+        self._create_relevant_resources(template_id, list(rel_resources_to_create))
+
+    def _delete_template_relevant_resources(
+        self,
+        rel_resources: List[RelevantResource],
+    ) -> None:
+        for rel_resource in rel_resources:
+            (
+                self.db_session.query(RelevantResource)
+                .filter(RelevantResource.id == rel_resource.id)
+                .delete(synchronize_session=False)
+            )
 
     def _update_meta(self, meta: TemplateMetaDB) -> Template:
         update_meta, _ = self._get_meta(meta.id)

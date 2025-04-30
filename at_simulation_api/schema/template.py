@@ -94,7 +94,7 @@ class RelevantResource(Base):
     
     template_usage_args = relationship(
         "TemplateUsageArgument",
-        cascade="all, delete",
+        cascade="all, delete-orphan",
     )
 
     __table_args__ = (
